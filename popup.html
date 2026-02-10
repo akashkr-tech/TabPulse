@@ -1,41 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tabPulse</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tabPulse</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div class="container">
+  <div class="container">
     <!-- Header -->
     <div class="header">
-      <h1>⚡ TabPulse</h1>
+      <h1> TabPulse</h1>
       <p class="subtitle">Feel the pulse of your tabs</p>
     </div>
 
-   <!-- Tab Count & Actions -->
-<div class="tab-count">
-  <span id="tabCount">0 tabs open</span>
-  <div class="action-buttons">
-    <button class="action-btn" id="newTabBtn" title="Open new tab">
-       New Tab
-    </button>
-    <button class="action-btn" id="refreshBtn" title="Refresh all tabs">
-       Refresh All
-    </button>
-  </div>
-</div>
+    <!-- Tab Count & Actions -->
+    <div class="tab-count">
+      <span id="tabCount">0 tabs open</span>
+      <div class="action-buttons">
+        <button class="action-btn" id="newTabBtn" title="Open new tab">
+          New Tab
+        </button>
+        <button class="action-btn" id="refreshBtn" title="Refresh all tabs">
+          Refresh All
+        </button>
+        <button class="action-btn" id="groupByDomainBtn" title="Group tabs by domain">
+          Group
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Bar Section -->
+    <div class="search-container">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search tabs by title or URL..."
+          autocomplete="off">
+        <button id="clearSearchBtn" class="clear-search" style="display: none;">×</button>
+      </div>
+    </div>
+
+    <!-- Search Bar Section -->
+    <div class="search-container">
+      ...
+    </div>
+
+    <!-- Sessions Section (NEW) -->
+    <div class="sessions-section">
+      <div class="sessions-header">
+        <h3 class="sessions-title">💾 Sessions</h3>
+        <button class="action-btn-small" id="saveSessionBtn" title="Save current tabs">
+          Save
+        </button>
+      </div>
+
+      <div class="sessions-list" id="sessionsList">
+        <div class="sessions-empty">No saved sessions</div>
+      </div>
+    </div>
 
     <!-- Tab List -->
     <div class="tab-list" id="tabList">
-      <!-- Tabs will be displayed here dynamically -->
-      <div class="loading">Loading tabs...</div>
-    </div>
-  </div>
 
-  <!-- JavaScript -->
-  <script src="popup.js"></script>
-    
+      <!-- Tab List -->
+      <div class="tab-list" id="tabList">
+        <!-- Tabs will be displayed here dynamically -->
+        <div class="loading">Loading tabs...</div>
+      </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="popup.js"></script>
+
 </body>
+
 </html>
