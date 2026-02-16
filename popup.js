@@ -1,9 +1,11 @@
 // TabPulse - Main Popup Script
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('TabPulse popup loaded ⚡');
+  console.log('TabPulse popup loaded ');
   loadTabs();
   setupButtons();
-  setupSearch();
+   setupSearch();
+   setupSessionButtons();
+   loadSessions();
 });
 
 // Main function to load and display all tabs
@@ -383,6 +385,9 @@ async function groupTabsByDomain(){
         }
     }
 
+
+
+
     //colors for grouping (nice variety)
         let colors = ['blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan', 'orange'];
         let colorIndex = 0;
@@ -417,3 +422,218 @@ async function groupTabsByDomain(){
   }
 
 }
+
+    // save current session
+
+    async function saveSession(){
+      try{
+        //get current tabs
+        let tabs = await chrome.tabs.query({currentWindow:true});
+
+
+        //filter out chrome://URLs
+        let validTabs = tabs.filter(function(tab){
+          return !tab.url.startsWith('chrome://') && !tab.url.startsWith('chrome-extesion://');
+        });
+
+        if(validTabs.length ===0){
+          alert('No valid tabs to save in session');
+          return
+        }
+
+        //ask for session name
+        let sessionName = prompt('Enter session name:','My Session');
+
+        if(!sessionName){
+          return;
+        }
+
+        //create session object
+        let session = {
+          name:sessionName.trim(),
+          timestamp:new Date().toISOString(),
+          tabs:validTabs.map(function(tab){
+            return {
+              url:tab.url,
+              title: tab.title
+            };
+          })
+        };
+
+        //get existing sessions
+        let result = await chrome.storage.local.get(['sessions']);
+        let sessions = result.sessions || [];
+
+        // Add new session
+        sessions.push(session);
+
+        //save to storage
+        await chrome.storage.local.set({sessions:sessions});
+
+        console.log('session saved: ' + sessionName + '(' + validTabs.length + ' tabs)');
+
+
+        // update ui
+
+        loadSessions();
+
+      }catch(error){
+        console.error('Error saving session:',error);
+        alert('Failed to save session');
+
+      }
+    }
+
+    // Load and display saved sessions
+
+    async function loadSessions(){
+      try{
+        let result = await chrome.storage.local.get(['sessions']);
+        let sessions = result.sessions || [];
+
+
+        let sessionsList = document.getElementById('sessionsList');
+
+        if (!sessionsList) return;
+
+        // clear current list
+        sessionsList.innerHTML = '';
+
+        if(sessions.length ===0){
+          sessionsList.innerHTML =  '<div class="sessions-empty">No saved sessions</div>';
+          return;
+        }
+
+        // display each session
+        sessions.forEach(function(session,index){
+          let sessionItem = createSessionElement(session,index);
+          sessionsList.appendChild(sessionItem);
+        });
+      }catch(error){
+        console.error('Error loading sessions:',error);
+
+      }
+    }
+
+    //create session element 
+    function createSessionElement(session,index){
+      let sessionItem = document.createElement('div');
+      sessionItem.className = 'session-item';
+
+      //format timestamp
+      let date = new Date(session.timestamp);
+      let formatteDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        // session Info
+       let sessionInfo = document.createElement('div');
+       sessionInfo.className = 'session-info';
+
+       let sessioName = document.createElement('div');
+       sessioName.className = "session-name";
+       sessioName.textContent = session.name;
+
+       let sessionMeta = document.createElement('div');
+       sessionMeta.className = 'session-meta';
+       sessionMeta.textContent = session.tabs.length + ' tabs • ' + formatteDate;
+
+
+       sessionInfo.appendChild(sessioName);
+       sessionInfo.appendChild(sessionMeta);
+
+       //Action buttions 
+
+       let sessionActions = document.createElement('div');
+       sessionActions.className = 'session-actions';
+
+       let restoreBtn = document.createElement('button');
+       restoreBtn.className = 'session-btn restore-btn';
+       restoreBtn.textContent = 'Restore';
+       restoreBtn.addEventListener('click' , function(){
+        restoreSession(index);
+       });
+
+       sessionActions.appendChild(restoreBtn);
+       sessionActions.appendChild(deleteBtn);
+
+       sessionItem.appendChild(sessionInfo);
+       sessionItem.appendChild(sessionActions);
+
+       return sessionItem;
+
+
+    }
+
+    // Restore a saved session
+    async function restoreSession(index){
+      try{
+        let result = await chrome.storage.local.get(['sessions']);
+        let sessions = result.sessions || [];
+
+        if(!sessions[index]){
+          alert('Session not found');
+          return;
+        }
+
+        let session = sessions[index];
+
+        //confirm before opening multiple tabs
+        let confirmed = confirm('open' + session.tabs.length + ' tabs from "' + session.name + '"?');
+
+        if(!confirmed){
+          return;
+        }
+
+        // open all tabs
+        for(let i =0 ; i<session.tabs.length; i++){
+          await chrome.tabs.create({
+            url:session.tabs[i].url,
+            active: i ===0 
+          });
+        }
+
+        console.log('Session restored:' +  session.name);
+
+      }catch(error){
+        console.error('Error restoring session:',error);
+        alert('Failed to restore session');
+
+      }
+
+    }
+
+    // Delete a saved session
+    async function deleteSession(index){
+      try{
+        let result = await chrome.storage.local.get(['sessions']);
+        let sessions = result.sessions || [];
+
+        if(!sessions[index]){
+          return;
+        }
+
+        let sessionName = sessions[index].name;
+
+        //confirm deletion
+        let confirmed = confirm('Delete session"' + sessionName + '"?');
+
+        if (!confirmed){
+          return;
+        }
+
+          // remove from array
+          sessions.splice(index, 1);
+
+          //save update session
+          await chrome.storage.local.set({sessions:sessions});
+
+          // update ui
+
+          loadSessions();
+          
+
+        }catch(error){
+          console.error('Error deleting session:' , error);
+      }
+    }
+
+    
