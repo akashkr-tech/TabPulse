@@ -17,20 +17,24 @@
     </div>
 
     <!-- Tab Count & Actions -->
-    <div class="tab-count">
-      <span id="tabCount">0 tabs open</span>
-      <div class="action-buttons">
-        <button class="action-btn" id="newTabBtn" title="Open new tab">
-          New Tab
-        </button>
-        <button class="action-btn" id="refreshBtn" title="Refresh all tabs">
-          Refresh All
-        </button>
-        <button class="action-btn" id="groupByDomainBtn" title="Group tabs by domain">
-          Group
-        </button>
-      </div>
-    </div>
+    <!-- Tab Count & Actions -->
+<div class="tab-count">
+  <div class="count-info">
+    <span id="tabCount">0 tabs open</span>
+    <span class="stat-badge" id="todayBadge" title="Tabs opened today">📊 Today: 0</span>
+  </div>
+  <div class="action-buttons">
+    <button class="action-btn" id="newTabBtn" title="Open new tab">
+      ➕ New Tab
+    </button>
+    <button class="action-btn" id="refreshBtn" title="Refresh all tabs">
+      🔄 Refresh All
+    </button>
+    <button class="action-btn" id="groupByDomainBtn" title="Group tabs by domain">
+      📂 Group
+    </button>
+  </div>
+</div>
 
     <!-- Search Bar Section -->
     <div class="search-container">
@@ -40,11 +44,6 @@
           autocomplete="off">
         <button id="clearSearchBtn" class="clear-search" style="display: none;">×</button>
       </div>
-    </div>
-
-    <!-- Search Bar Section -->
-    <div class="search-container">
-      ...
     </div>
 
     <!-- Sessions Section (NEW) -->
@@ -61,15 +60,14 @@
       </div>
     </div>
 
-    <!-- Tab List -->
-    <div class="tab-list" id="tabList">
+   
 
       <!-- Tab List -->
       <div class="tab-list" id="tabList">
         <!-- Tabs will be displayed here dynamically -->
         <div class="loading">Loading tabs...</div>
       </div>
-    </div>
+    
 
     <!-- JavaScript -->
     <script src="popup.js"></script>
