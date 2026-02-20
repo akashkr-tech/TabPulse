@@ -92,3 +92,112 @@ chrome.tabs.onRemoved.addListener(async function() {
     console.error('Error tracking tab close:', error);
   }
 });
+
+
+let tabLastActive = {};
+
+chrome.alarms.create('checkInactiveTabs',{
+  periodInMinutes: 1 
+});
+
+
+//// Track when tab is updated (clicked, navigated)
+
+chrome.tabs.onUpdate.addListener(function(tabId,changeInfo){
+  if(changeInfo.status === 'complete' || changeInfo.url){
+    tabLastActive[tabId] = Date.now();
+  }
+});
+
+// Clean up when tab is closed
+chrome.tabs.onRemoved.addListener(function(tabId){
+  delete tabLastActive[tabId];
+});
+
+// Check for inactive tabs periodically
+chrome.alarms.onAlarm.addListener(async function(alarm){
+  if(alarm.name === 'checkInactiveTabs'){
+    await closeInactiveTabs();
+  }
+});
+
+// Main function to close inactive tabs
+
+async function closeInactiveTabs(){
+  try{
+    //get settings
+    let result = await chrome.storage.local.get(['autoCloseEnabled', 'autoCloseTime']);
+    let enabled = result.autoCloseEnabled || false;
+    let timeLimit = result.autoCloseTime || 30; //default 30 minutes
+    
+    if(!enabled){
+      return;
+    }
+
+    let now = Date.now();
+    let timeLimitMs  = timeLimit * 60 * 1000; // convert milliseconds
+    
+    //get all tabs
+    let tabs = await chrome.tabs.query({});
+
+    for(let tab of tabs){
+      //Skip chrome:// URLs
+      if(tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extention')){
+        continue;
+      }
+
+      //Skip tab active
+      if(tab.active){
+        continue;
+      }
+      // Skip tabs with audio
+      if(tab.audible){
+        continue;
+      }
+
+      //check last active time
+      let lastActive = tabLastActive[tab.id];
+
+      if(!lastActive){
+        // First time seeing this tab, mark it
+        tabLastActive[tab.id] = now;
+        continue;
+      }
+
+      let inactiveTime = now - lastActive;
+
+      // Close if inactive for longer than limit
+      if(inactiveTime > timeLimitMs){
+        console.log('closing inactive tab:' , tab.title, 'Inactive for:' , Math.floor(inactiveTime / 60000), 'minutes');
+
+        await chrome.tabs.remove(tab.id);
+        delete tabLastActive[tab.id];
+      }
+    }
+
+  }catch(error){
+    console.error('Error checking inactive tabs:' , error);
+  
+  }
+}
+
+// Initialize tracking for existing tabs on startup
+chrome.runtime.onStartup.addListener(async function(){
+  let tabs = await chrome.tabs.query({});
+  let now = Date.now();
+
+  for(let tab of tabs){
+    tabLastActive[tab.id] = now;
+  }
+});
+
+// Initialize on install
+chrome.runtime.onInstalled.addListener(function(details){
+  if(details.reason === 'install'){
+     // Set default settings
+      chrome.storage.local.set({
+      autoCloseEnabled: false,
+      autoCloseTime: 30 
+    });
+  }
+})

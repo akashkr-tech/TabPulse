@@ -532,3 +532,111 @@ body{
 .sessions-section::-webkit-scrollbar-thumb:hover {
   background: #a0aec0;
 }
+
+
+.settings-section{
+  background-color: #fff;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.settings-header{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  cursor: pointer;
+}
+
+
+.settings-header:hover {
+  background-color: #f0f0f0;
+}
+
+.settings-title{
+  font-size: 14px;
+  font-weight:600 ;
+  color: #333;
+  margin: 0;
+}
+
+.collapse-btn {
+  background: none;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  color: #666;
+  transition: transform 0.3s;
+}
+
+.collapse-btn.collapsed {
+  transform: rotate(-90deg);
+}
+
+
+.settings-content {
+  padding: 10px 20px;
+  max-height: 200px;
+  overflow: hidden;
+  transition: max-heigth 0.3s ease;
+}
+
+.settings-content.hidden{
+  max-height: 0;
+  padding: 0 20px;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-info {
+  flex: 1;
+}
+
+.setting-name{
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 3px;
+}
+
+.setting-desc {
+  font-size: 11px;
+  color: #777;
+}
+
+.toggle-switch{
+  position: relative;
+  width: 44px;
+  height: 24px;
+  display: inline-block;
+}
+
+.toggle-switch input{
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider{
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 24px;
+}
+

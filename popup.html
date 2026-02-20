@@ -60,6 +60,41 @@
       </div>
     </div>
 
+    <!-- Settings Section -->
+<div class="settings-section">
+  <div class="settings-header">
+    <h3 class="settings-title">⚙️ Settings</h3>
+    <button class="collapse-btn" id="settingsToggle">▼</button>
+  </div>
+  
+  <div class="settings-content" id="settingsContent">
+    <div class="setting-item">
+      <div class="setting-info">
+        <div class="setting-name">Auto-close Inactive Tabs</div>
+        <div class="setting-desc">Close tabs inactive for 30+ minutes</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="autoCloseToggle">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    
+    <div class="setting-item" id="autoCloseTimeContainer" style="display: none;">
+      <div class="setting-info">
+        <div class="setting-name">Inactivity Time</div>
+        <div class="setting-desc">Minutes before auto-close</div>
+      </div>
+      <select class="time-select" id="autoCloseTimeSelect">
+        <option value="15">15 minutes</option>
+        <option value="30" selected>30 minutes</option>
+        <option value="45">45 minutes</option>
+        <option value="60">60 minutes</option>
+      </select>
+    </div>
+  </div>
+</div>
+          
+
    
 
       <!-- Tab List -->
