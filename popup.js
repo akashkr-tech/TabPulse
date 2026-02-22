@@ -6,7 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
   setupSearch();
   setupSessionButtons();
   loadSessions();
-   updateDailyStats(); 
+  updateDailyStats(); 
+  setupSettings();
+  setTimeout(function() {
+    loadSettings();
+  }, 100);
 });
 
 // Main function to load and display all tabs
@@ -720,5 +724,103 @@ async function trackTabClosed(){
   }catch(error){
     console.error('Error tracking tab closed' , error);
 
+  }
+}
+
+// Setup settings
+function setupSettings() {
+  // Toggle collapse
+  let settingsToggle = document.getElementById('settingsToggle');
+  let settingsContent = document.getElementById('settingsContent');
+  
+  if (settingsToggle) {
+    settingsToggle.addEventListener('click', function() {
+      settingsContent.classList.toggle('hidden');
+      settingsToggle.classList.toggle('collapsed');
+    });
+  }
+  
+  // Auto-close toggle
+  let autoCloseToggle = document.getElementById('autoCloseToggle');
+  let timeContainer = document.getElementById('autoCloseTimeContainer');
+  
+  if (autoCloseToggle) {
+    autoCloseToggle.addEventListener('change', async function() {
+      let enabled = this.checked;
+      
+      await chrome.storage.local.set({ autoCloseEnabled: enabled });
+      
+      // Show/hide time selector
+      if (timeContainer) {
+        timeContainer.style.display = enabled ? 'flex' : 'none';
+      }
+      
+      console.log('Auto-close ' + (enabled ? 'enabled' : 'disabled'));
+    });
+  }
+  
+  // Time select
+  let timeSelect = document.getElementById('autoCloseTimeSelect');
+  
+  if (timeSelect) {
+    timeSelect.addEventListener('change', async function() {
+      let time = parseInt(this.value);
+      
+      await chrome.storage.local.set({ autoCloseTime: time });
+      
+      console.log('Auto-close time set to ' + time + ' minutes');
+    });
+  }
+}
+
+
+// Auto-close empty tabs toggle
+let autoCloseEmptyToggle = document.getElementById('autoCloseEmptyToggle');
+
+if (autoCloseEmptyToggle) {
+  autoCloseEmptyToggle.addEventListener('change', async function() {
+    let enabled = this.checked;
+    
+    await chrome.storage.local.set({ autoCloseEmptyEnabled: enabled });
+    
+    console.log('Auto-close empty tabs ' + (enabled ? 'enabled' : 'disabled'));
+  });
+}
+
+// Load settings from storage
+async function loadSettings() {
+  try {
+    let result = await chrome.storage.local.get(['autoCloseEnabled', 'autoCloseTime','autoCloseEmptyEnabled']);
+    
+    let enabled = result.autoCloseEnabled || false;
+    let time = result.autoCloseTime || 20;
+    let emptyEnabled = result.autoCloseEmptyEnabled || false;
+    
+    // Set toggle
+    let autoCloseToggle = document.getElementById('autoCloseToggle');
+    if (autoCloseToggle) {
+      autoCloseToggle.checked = enabled;
+    }
+    
+    // Set time select
+    let timeSelect = document.getElementById('autoCloseTimeSelect');
+    if (timeSelect) {
+      timeSelect.value = time;
+    }
+    
+    // Show/hide time container
+    let timeContainer = document.getElementById('autoCloseTimeContainer');
+    if (timeContainer) {
+      timeContainer.style.display = enabled ? 'flex' : 'none';
+    }
+
+     // Set empty tab toggle
+    let autoCloseEmptyToggle = document.getElementById('autoCloseEmptyToggle');
+    if (autoCloseEmptyToggle) {
+      autoCloseEmptyToggle.checked = emptyEnabled;
+    }
+    
+  } catch (error) {
+    console.error('Error loading settings:', error);
   }
 }
